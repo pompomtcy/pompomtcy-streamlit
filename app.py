@@ -119,36 +119,67 @@ def analyze_statin(data):
 
 
 # ===== UI =====
-st.header("Statin Decision Support App by PPTCY")
+st.header("Statin Decision support app by PPTCY")
 
-is_dm = st.radio("Is patient DM?", ["No", "Yes"]) == "Yes"
-age = st.number_input("Age", 0, 120)
-ldl = st.number_input("LDL-C (mg/dL)", 0.0)
+errors = []
 
-# 🔥 FIX สำคัญ: ใช้ ldl (ตัวเล็ก)
+is_dm = st.radio("Is patient DM?", ["No","Yes"]) == "Yes"
+
+age = st.number_input("Age", 0, 120, value=None, placeholder="Enter age")
+ldl = st.number_input("LDL-C (mg/dL)", min_value=0.0, value=None, placeholder="Enter LDL")
+
 data = {"is_dm": is_dm, "age": age, "ldl": ldl}
 
+# ===== VALIDATE BASIC =====
+if age is None:
+    errors.append("Age is required")
+if ldl is None:
+    errors.append("LDL is required")
+
+# ===== DM =====
 if is_dm:
     st.subheader("DM Risk Factors")
-    risks = ["Long duration DM", "Obesity", "Smoking", "HT", "Family History", "CKD", "Albuminuria"]
+    risks = ["Long duration DM","Obesity","Smoking","HT","Family History","CKD","Albuminuria"]
     data['dm_risks'] = {r: st.checkbox(r) for r in risks}
 
+# ===== NON-DM =====
 else:
     st.subheader("Non-DM Assessment")
-    data['is_male'] = st.radio("Gender", ["Female", "Male"]) == "Male"
+
+    gender = st.radio("Gender", ["Female", "Male"], index=None)
+    data['is_male'] = (gender == "Male")
+
+    if gender is None:
+        errors.append("Gender is required")
+
     data['is_smoker'] = st.checkbox("Smoking")
-    data['sbp'] = st.number_input("SBP (mmHg)")
-    data['tc'] = st.number_input("Total cholesterol")
-    data['hdl'] = st.number_input("HDL")
-    data['egfr'] = st.number_input("eGFR")
+
+    data['sbp'] = st.number_input("SBP (mmHg)", value=None, placeholder="e.g. 120")
+    data['tc'] = st.number_input("Total cholesterol", value=None)
+    data['hdl'] = st.number_input("HDL", value=None)
+    data['egfr'] = st.number_input("eGFR", value=None)
     data['subclinical'] = st.checkbox("Subclinical ASCVD")
 
-if st.button("Analyze"):
+    if data['sbp'] is None:
+        errors.append("SBP is required")
+    if data['tc'] is None:
+        errors.append("Total cholesterol is required")
+    if data['hdl'] is None:
+        errors.append("HDL is required")
+
+# ===== SHOW ERRORS =====
+if errors:
+    st.error("⚠️ Please fill required fields:")
+    for e in errors:
+        st.write(f"- {e}")
+
+# ===== BUTTON =====
+if st.button("Analyse", disabled=len(errors) > 0):
     result = analyze_statin(data)
 
     st.success("Result")
-    st.write("Group:", result['Group'])
+    st.write("Group :", result['Group'])
     st.write("Case:", result['Case'])
-    st.write("Recommendation:", result['Rec'])
+    st.write("Reccommendation:", result['Rec'])
     st.write("Target LDL:", result['Target'])
     st.write("Goal:", result['Reduction'])

@@ -178,8 +178,8 @@ if st.button("Check", disabled=len(errors) > 0):
     result = analyze_statin(data)
 
     st.success("Result")
-    st.write("Group :", result['Group'])
+    st.write("#DLP with", result['Group'])
     st.write("Case:", result['Case'])
     st.write("Reccommendation:", result['Rec'])
-    st.write("Target LDL:", result['Target'])
+    st.write("Target :", result['Target'])
     st.write("Reduction goal:", result['Reduction'])

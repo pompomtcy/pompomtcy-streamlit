@@ -42,16 +42,16 @@ def analyze_statin(data):
                 reduction = ">=50%"
 
             return {
-                "Group": "DM Primary Prevention",
+                "Group": "DM, Primary Prevention",
                 "Case": case,
-                "Rec": "Statin",
+                "Rec": "Start Statin",
                 "Target": target,
                 "Reduction": reduction
             }
 
         else:
             return {
-                "Group": "DM Primary Prevention",
+                "Group": "DM, Primary Prevention",
                 "Case": "DM (Age <40)",
                 "Rec": "Lifestyle modification",
                 "Target": "LDL < 100 mg/dL",
@@ -63,7 +63,7 @@ def analyze_statin(data):
 
     if age >= 21 and ldl >= 190:
         return {
-            "Group": "Severe Hypercholesterolemia",
+            "Group": "High risk, Primary prevention",
             "Case": f"LDL ≥190",
             "Rec": "High-intensity statin",
             "Target": "LDL < 100 mg/dL",
@@ -84,7 +84,7 @@ def analyze_statin(data):
     if age >= 35 and ldl < 190:
         if risk >= 10:
             return {
-                "Group": "Non-DM High Risk",
+                "Group": "Non-DM High Risk, Primary prevention",
                 "Case": f"Thai CV Risk {risk}%",
                 "Rec": "Statin",
                 "Target": "LDL < 100 mg/dL",

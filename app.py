@@ -23,7 +23,7 @@ def analyze_statin(data) :
         case, target, reduction = "DM ( Risk>=2 pts)","LDL<70 mg/dL",">=30%"
       return {"Group": "DM Primary Prevention", "Case":"DM(Age<40)","Rec":"3-6 mo LSM", "Target":"LDL<100 mg/dL","Reduction" : "no"}
 
-    else
+    else:
       if age >= 21 and ldl >= 190:
         return {"Group":"Non-DM Primary", "Case": f"CKD(eGFR{egfr})"."Rec" : "Low-Moderate Statin", "Target" : "LDL < 100 mg/dL", "Reduction": ">=30%"}
 

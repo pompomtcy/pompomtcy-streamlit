@@ -33,7 +33,7 @@ def analyze_statin(data) :
       if risk >= 10 :
         return {"Group": "Non-DM","Case": f"Thai CV Risk {risk}%","Rec":"Statin","Target":"LDL < 100mg/dL" ,"Reduction":">=30%"}
       if data['subclinical'] :
-        return {"Group": "Non-DM","Case": "Subclinical ASCVD","Rec":"Statin","LDL < 100mg/dL", "Reduction":">=30%"}
+        return {"Group": "Non-DM","Case": "Subclinical ASCVD","Rec":"Statin","Target":"LDL < 100mg/dL", "Reduction":">=30%"}
 
       return{"Group":"Low Risk","Case" : f"Thai Risk {risk}%", "Rec":"LSM","Target":"-","Reduction":"-"}
 #UI

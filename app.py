@@ -119,8 +119,8 @@ def analyze_statin(data):
 
 
 # ===== UI =====
-st.header("Statin Decision support app by PPTCY")
-
+st.header("Statin Decision support App ")
+st.subheader("By PPtcy")
 errors = []
 
 is_dm = st.radio("Is patient DM?", ["No","Yes"]) == "Yes"
@@ -174,7 +174,7 @@ if errors:
         st.write(f"- {e}")
 
 # ===== BUTTON =====
-if st.button("Analyse", disabled=len(errors) > 0):
+if st.button("Check", disabled=len(errors) > 0):
     result = analyze_statin(data)
 
     st.success("Result")
@@ -182,4 +182,4 @@ if st.button("Analyse", disabled=len(errors) > 0):
     st.write("Case:", result['Case'])
     st.write("Reccommendation:", result['Rec'])
     st.write("Target LDL:", result['Target'])
-    st.write("Goal:", result['Reduction'])
+    st.write("Reduction goal:", result['Reduction'])

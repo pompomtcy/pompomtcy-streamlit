@@ -45,4 +45,27 @@ ldl = st.number_input("LDL-C (mg/dL)",0.0)
 
 data = {"is_dm" : is_dm, "age":age,"LDL":ldl}
 
-        
+if is_dm:
+  st.subheader("DM Risk Factors")
+  risks = ["Long duration DM","Obesity","Smoking","HT","Family History","CKD","Albuminuria"]
+  data['dm_risks']={r.st.checkbox(r) for r in risks}
+else:
+  st.subheader("Non-DM Assessment")
+  data['is_male'] = st.radio("Gender", ["Female", "Male"]) == ""
+  data['is_smoker'] = st.checkbox("smoking")
+  data['sbp']= st.number_input("SBP(mmHg)")
+  data['tc']= st.number_input("Total cholesterol")
+  data['hdl']= st.number_input("HDL")        
+  data['egft']= st.number_input("eGFR")     
+  data['subclinical'] = st.checkbox("subclinical ASCVD")
+if st.button("Analyse"):
+  result = analyze_statin(data)
+
+  st.success("Result")
+  st.write("#DLP")
+  st.write("Group :", result['Group'])
+  st.write("Case:", result['Case'])
+  st.write("Reccommendation:", result['Rec'])
+  st.write("Target LDL:", result['Target'])
+  st.write("Goal:", result['Reduction'])
+  

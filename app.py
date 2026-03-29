@@ -35,7 +35,7 @@ def analyze_statin(data) :
       if data['subclinical']
         return {"Group": "Non-DM","Case": "Subclinical ASCVD","Rec":"Statin","LDL < 100mg/dL", "Reduction":">=30%"}
 
-      return["Group":"Low Risk","Case" : f"Thai Risk {risk}%", "Rec":"LSM","Target":"-","Reduction":"-"}
+      return{"Group":"Low Risk","Case" : f"Thai Risk {risk}%", "Rec":"LSM","Target":"-","Reduction":"-"}
 #UI
 st.header("Statin Decision support app by PPTCY")
 

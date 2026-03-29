@@ -25,7 +25,7 @@ def analyze_statin(data) :
 
     else:
       if age >= 21 and ldl >= 190:
-        return {"Group":"Non-DM Primary", "Case": f"CKD(eGFR{egfr})"."Rec" : "Low-Moderate Statin", "Target" : "LDL < 100 mg/dL", "Reduction": ">=30%"}
+        return {"Group":"Non-DM Primary", "Case": f"CKD(eGFR{egfr})","Rec" : "Low-Moderate Statin", "Target" : "LDL < 100 mg/dL", "Reduction": ">=30%"}
 
     risk = calculate_thai_cv_risk_lab(data['is_male'], age,data['is_smoker'], False,data['sbp'],data['tc'],data['hdl'])
 

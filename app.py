@@ -179,7 +179,7 @@ if st.button("Check", disabled=len(errors) > 0):
 
     st.success("Result")
     st.write("#DLP with", result['Group'])
-    st.write("Case:", result['Case'])
+    st.write("->", result['Case'])
     st.write("Reccommendation:", result['Rec'])
     st.write("Target :", result['Target'])
     st.write("Reduction goal:", result['Reduction'])

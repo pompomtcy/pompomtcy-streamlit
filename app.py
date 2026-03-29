@@ -3,11 +3,11 @@ st.title("Dolnapat Thiangchanya")
 st.write("My first streamlit app")
 
 import math
-def calculatte_thai_cv_risk_lab(is_male, age, is_smoker, has_dm, sbp, tc, hdl):
+def calculate_thai_cv_risk_lab(is_male, age, is_smoker, has_dm, sbp, tc, hdl):
   score = (0.0631 * age ) + (0.6121 if is_male else 0 ) + (0.5057 if is_smoker else 0) + (0.5753 if has_dm else 0) + (0.0112 * sbp) + ( 0.0055 * tc ) + (-0.0184 *hdl)
   survival_10yr, mean_score = 0.9768, 7.152
   risk_factor = math.exp(score-mean_score)
-  return round((1-(survival_10y ** risk_factor)) * 100, 2 )
+  return round((1-(survival_10yr ** risk_factor)) * 100, 2 )
   
 def analyze_statin(data) :
   age, ldl, is_dm = data['age'], data['ldl'], data['is_dm']
@@ -48,15 +48,15 @@ data = {"is_dm" : is_dm, "age":age,"LDL":ldl}
 if is_dm:
   st.subheader("DM Risk Factors")
   risks = ["Long duration DM","Obesity","Smoking","HT","Family History","CKD","Albuminuria"]
-  data['dm_risks']={r.st.checkbox(r) for r in risks}
+  data['dm_risks']={r:st.checkbox(r) for r in risks}
 else:
   st.subheader("Non-DM Assessment")
-  data['is_male'] = st.radio("Gender", ["Female", "Male"]) == ""
+  data['is_male'] = st.radio("Gender", ["Female", "Male"]) == "Male"
   data['is_smoker'] = st.checkbox("smoking")
   data['sbp']= st.number_input("SBP(mmHg)")
   data['tc']= st.number_input("Total cholesterol")
   data['hdl']= st.number_input("HDL")        
-  data['egft']= st.number_input("eGFR")     
+  data['egfr']= st.number_input("eGFR")     
   data['subclinical'] = st.checkbox("subclinical ASCVD")
 if st.button("Analyse"):
   result = analyze_statin(data)

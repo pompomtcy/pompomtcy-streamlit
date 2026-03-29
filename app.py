@@ -3,69 +3,152 @@ st.title("Dolnapat Thiangchanya")
 st.write("My first streamlit app")
 
 import math
+import streamlit as st
+
+# ===== CV RISK =====
 def calculate_thai_cv_risk_lab(is_male, age, is_smoker, has_dm, sbp, tc, hdl):
-  score = (0.0631 * age ) + (0.6121 if is_male else 0 ) + (0.5057 if is_smoker else 0) + (0.5753 if has_dm else 0) + (0.0112 * sbp) + ( 0.0055 * tc ) + (-0.0184 *hdl)
-  survival_10yr, mean_score = 0.9768, 7.152
-  risk_factor = math.exp(score-mean_score)
-  return round((1-(survival_10yr ** risk_factor)) * 100, 2 )
-  
-def analyze_statin(data) :
-  age, ldl, is_dm = data['age'], data['ldl'], data['is_dm']
+    score = (
+        (0.0631 * age)
+        + (0.6121 if is_male else 0)
+        + (0.5057 if is_smoker else 0)
+        + (0.5753 if has_dm else 0)
+        + (0.0112 * sbp)
+        + (0.0055 * tc)
+        + (-0.0184 * hdl)
+    )
+    survival_10yr, mean_score = 0.9768, 7.152
+    risk_factor = math.exp(score - mean_score)
+    return round((1 - (survival_10yr ** risk_factor)) * 100, 2)
 
-  if is_dm:
-    risk_count = sum(data['dm_risks'].values())
-    if age >= 40:
-      if risk_count <= 1:
-        target = "LDL < 100 mg/dL"
-        reduction = ">=30%" if ldl < 190 else ">=50%"
-        case = f"DM ( Age >= 40, Risk{risk_count}pts)"
-      else:
-        case, target, reduction = "DM ( Risk>=2 pts)","LDL<70 mg/dL",">=30%"
-      return {"Group": "DM Primary Prevention", "Case":"DM(Age<40)","Rec":"3-6 mo LSM", "Target":"LDL<100 mg/dL","Reduction" : "no"}
 
-    else:
-      if age >= 21 and ldl >= 190:
-        return {"Group":"Non-DM Primary", "Case": f"CKD(eGFR{egfr})","Rec" : "Low-Moderate Statin", "Target" : "LDL < 100 mg/dL", "Reduction": ">=30%"}
+# ===== ANALYSIS =====
+def analyze_statin(data):
+    age = data.get('age')
+    ldl = data.get('ldl')
+    is_dm = data.get('is_dm')
 
-    risk = calculate_thai_cv_risk_lab(data['is_male'], age,data['is_smoker'], False,data['sbp'],data['tc'],data['hdl'])
+    # ===== DM =====
+    if is_dm:
+        risk_count = sum(data.get('dm_risks', {}).values())
 
-    if age >= 35 and ldl < 190 :
-      if risk >= 10 :
-        return {"Group": "Non-DM","Case": f"Thai CV Risk {risk}%","Rec":"Statin","Target":"LDL < 100mg/dL" ,"Reduction":">=30%"}
-      if data['subclinical'] :
-        return {"Group": "Non-DM","Case": "Subclinical ASCVD","Rec":"Statin","Target":"LDL < 100mg/dL", "Reduction":">=30%"}
+        if age >= 40:
+            if risk_count <= 1:
+                case = f"DM (Age ≥40, Risk {risk_count})"
+                target = "LDL < 100 mg/dL"
+                reduction = ">=30%" if ldl < 190 else ">=50%"
+            else:
+                case = "DM (Risk ≥2)"
+                target = "LDL < 70 mg/dL"
+                reduction = ">=50%"
 
-      return{"Group":"Low Risk","Case" : f"Thai Risk {risk}%", "Rec":"LSM","Target":"-","Reduction":"-"}
-#UI
-st.header("Statin Decision support app by PPTCY")
+            return {
+                "Group": "DM Primary Prevention",
+                "Case": case,
+                "Rec": "Statin",
+                "Target": target,
+                "Reduction": reduction
+            }
 
-is_dm = st.radio("Is patient DM?", ["No","Yes"]) == "Yes"
-age = st.number_input("Age",0,120)
-ldl = st.number_input("LDL-C (mg/dL)",0.0)
+        else:
+            return {
+                "Group": "DM Primary Prevention",
+                "Case": "DM (Age <40)",
+                "Rec": "Lifestyle modification",
+                "Target": "LDL < 100 mg/dL",
+                "Reduction": "-"
+            }
 
-data = {"is_dm" : is_dm, "age":age,"LDL":ldl}
+    # ===== Non-DM =====
+    egfr = data.get('egfr')
+
+    if age >= 21 and ldl >= 190:
+        return {
+            "Group": "Severe Hypercholesterolemia",
+            "Case": f"LDL ≥190",
+            "Rec": "High-intensity statin",
+            "Target": "LDL < 100 mg/dL",
+            "Reduction": ">=50%"
+        }
+
+    # calculate risk
+    risk = calculate_thai_cv_risk_lab(
+        data.get('is_male'),
+        age,
+        data.get('is_smoker'),
+        False,
+        data.get('sbp'),
+        data.get('tc'),
+        data.get('hdl')
+    )
+
+    if age >= 35 and ldl < 190:
+        if risk >= 10:
+            return {
+                "Group": "Non-DM High Risk",
+                "Case": f"Thai CV Risk {risk}%",
+                "Rec": "Statin",
+                "Target": "LDL < 100 mg/dL",
+                "Reduction": ">=30%"
+            }
+
+        if data.get('subclinical'):
+            return {
+                "Group": "Non-DM",
+                "Case": "Subclinical ASCVD",
+                "Rec": "Statin",
+                "Target": "LDL < 100 mg/dL",
+                "Reduction": ">=30%"
+            }
+
+        return {
+            "Group": "Low Risk",
+            "Case": f"Thai Risk {risk}%",
+            "Rec": "Lifestyle modification",
+            "Target": "-",
+            "Reduction": "-"
+        }
+
+    # fallback กัน error
+    return {
+        "Group": "Unknown",
+        "Case": "Insufficient data",
+        "Rec": "-",
+        "Target": "-",
+        "Reduction": "-"
+    }
+
+
+# ===== UI =====
+st.header("Statin Decision Support App by PPTCY")
+
+is_dm = st.radio("Is patient DM?", ["No", "Yes"]) == "Yes"
+age = st.number_input("Age", 0, 120)
+ldl = st.number_input("LDL-C (mg/dL)", 0.0)
+
+# 🔥 FIX สำคัญ: ใช้ ldl (ตัวเล็ก)
+data = {"is_dm": is_dm, "age": age, "ldl": ldl}
 
 if is_dm:
-  st.subheader("DM Risk Factors")
-  risks = ["Long duration DM","Obesity","Smoking","HT","Family History","CKD","Albuminuria"]
-  data['dm_risks']={r:st.checkbox(r) for r in risks}
-else:
-  st.subheader("Non-DM Assessment")
-  data['is_male'] = st.radio("Gender", ["Female", "Male"]) == "Male"
-  data['is_smoker'] = st.checkbox("smoking")
-  data['sbp']= st.number_input("SBP(mmHg)")
-  data['tc']= st.number_input("Total cholesterol")
-  data['hdl']= st.number_input("HDL")        
-  data['egfr']= st.number_input("eGFR")     
-  data['subclinical'] = st.checkbox("subclinical ASCVD")
-if st.button("Analyse"):
-  result = analyze_statin(data)
+    st.subheader("DM Risk Factors")
+    risks = ["Long duration DM", "Obesity", "Smoking", "HT", "Family History", "CKD", "Albuminuria"]
+    data['dm_risks'] = {r: st.checkbox(r) for r in risks}
 
-  st.success("Result")
-  st.write("#DLP")
-  st.write("Group :", result['Group'])
-  st.write("Case:", result['Case'])
-  st.write("Reccommendation:", result['Rec'])
-  st.write("Target LDL:", result['Target'])
-  st.write("Goal:", result['Reduction'])
-  
+else:
+    st.subheader("Non-DM Assessment")
+    data['is_male'] = st.radio("Gender", ["Female", "Male"]) == "Male"
+    data['is_smoker'] = st.checkbox("Smoking")
+    data['sbp'] = st.number_input("SBP (mmHg)")
+    data['tc'] = st.number_input("Total cholesterol")
+    data['hdl'] = st.number_input("HDL")
+    data['egfr'] = st.number_input("eGFR")
+    data['subclinical'] = st.checkbox("Subclinical ASCVD")
+
+if st.button("Analyze"):
+    result = analyze_statin(data)
+
+    st.success("Result")
+    st.write("Group:", result['Group'])
+    st.write("Case:", result['Case'])
+    st.write("Recommendation:", result['Rec'])
+    st.write("Target LDL:", result['Target'])
+    st.write("Goal:", result['Reduction'])

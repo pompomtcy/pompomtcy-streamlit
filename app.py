@@ -1,6 +1,6 @@
 import streamlit as st
 st.title("Dolnapat Thiangchanya")
-st.write("My first streamlit app")
+st.write("My first streamlit app 🙂")
 
 import math
 import streamlit as st
@@ -102,7 +102,7 @@ def analyze_statin(data):
 
         return {
             "Group": "Low Risk",
-            "Case": f"Thai Risk {risk}%",
+            "Case": f"Thai CV Risk {risk}%",
             "Rec": "Lifestyle modification",
             "Target": "-",
             "Reduction": "-"
@@ -180,6 +180,6 @@ if st.button("Check", disabled=len(errors) > 0):
     st.success("Result")
     st.write("#DLP with", result['Group'])
     st.write("->", result['Case'])
-    st.write("Reccommendation:", result['Rec'])
+    st.write("Recommendation:", result['Rec'])
     st.write("Target :", result['Target'])
     st.write("Reduction goal:", result['Reduction'])
